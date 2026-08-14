@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kantin Sekolah</title>
+<title>Kantin Kampus</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -203,7 +203,7 @@
  
 <header class="top">
   <div class="brand">
-    <span class="logo">Kantin Sekolah</span>
+    <span class="logo">Kantin Kampus</span>
     <span class="sub">preview</span>
   </div>
   <div class="tabs">
@@ -232,15 +232,21 @@
 <div class="toast" id="toast"></div>
  
 <script>
-/* ---------------- Storage helpers ---------------- */
+/* ---------------- Storage helpers ----------------
+   Versi ini pakai localStorage bawaan browser, jadi bisa jalan
+   di GitHub Pages / hosting statis manapun. Catatan: data hanya
+   tersimpan di browser/device itu sendiri, TIDAK otomatis sinkron
+   ke device lain. Kalau nanti butuh sinkron antar device (misalnya
+   admin update dari laptop, siswa lihat di HP), perlu database
+   online seperti Firebase — tinggal bilang aja kalau mau upgrade. */
 async function storageGet(key, shared){
   try{
-    const r = await window.storage.get(key, shared);
-    return r ? JSON.parse(r.value) : null;
+    const v = localStorage.getItem('kantin:' + key);
+    return v ? JSON.parse(v) : null;
   }catch(e){ return null; }
 }
 async function storageSet(key, value, shared){
-  try{ await window.storage.set(key, JSON.stringify(value), shared); }
+  try{ localStorage.setItem('kantin:' + key, JSON.stringify(value)); }
   catch(e){ console.error('storage set failed', key, e); }
 }
  
@@ -380,7 +386,7 @@ function openCart(){
     ${entries.length ? `
       <div class="zigzag"></div>
       <div class="total-row"><span>Total</span><span>${rupiah(total)}</span></div>
-      <textarea class="note-field" id="orderNote" placeholder="Catatan (opsional): kelas, level pedas, dll."></textarea>
+      <textarea class="note-field" id="orderNote" placeholder="Catatan (opsional): jurusan/gedung, level pedas, dll."></textarea>
       <button class="submit-btn" onclick="submitOrder()">Catat Pesanan</button>
       <p class="hint" style="text-align:center;">Ini masih preview — pembayaran tetap cash langsung di kantin ya.</p>
     ` : ''}
