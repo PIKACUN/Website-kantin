@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kantin Sekolah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F3EA;
+    --paper-alt:#EFE8D6;
+    --white:#FFFDF8;
+    --ink:#2B2620;
+    --ink-soft:#7A6F5D;
+    --line:#CBC0A8;
+    --stamp:#B33F3A;
+    --stamp-soft:#B33F3A22;
+    --turmeric:#D98F2B;
+    --turmeric-soft:#D98F2B22;
+    --green:#4C6B4F;
+    --green-soft:#4C6B4F1e;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'Space Mono',monospace;}
+  .marker{font-family:'Permanent Marker',cursive;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+ 
+  /* ---------- Header ---------- */
+  header.top{
+    position:sticky;top:0;z-index:40;
+    background:var(--paper);
+    border-bottom:2px dashed var(--line);
+    padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand .logo{font-family:'Permanent Marker',cursive;font-size:26px;color:var(--stamp);transform:rotate(-2deg);display:inline-block;}
+  .brand .sub{font-size:11px;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;}
+  .tabs{display:flex;gap:8px;}
+  .tab-btn{
+    border:2px solid var(--ink);border-bottom:none;
+    background:var(--paper-alt);
+    padding:8px 16px;border-radius:8px 8px 0 0;
+    font-weight:700;font-size:13px;letter-spacing:.02em;
+    position:relative;top:2px;
+  }
+  .tab-btn.active{background:var(--white);top:0;box-shadow:0 -2px 0 var(--white);}
+  .tab-btn .dot{display:none;}
+ 
+  main{max-width:1100px;margin:0 auto;padding:24px 20px 100px;}
+ 
+  /* ---------- Hero ---------- */
+  .hero{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    background:var(--white);
+    border:2px solid var(--ink);border-radius:14px;
+    padding:22px 26px;margin-bottom:22px;
+    position:relative;overflow:hidden;
+  }
+  .hero:before{
+    content:"";position:absolute;inset:0;
+    background-image:repeating-linear-gradient(135deg, var(--turmeric-soft) 0 2px, transparent 2px 14px);
+    opacity:.5;pointer-events:none;
+  }
+  .hero h1{font-family:'Permanent Marker',cursive;font-size:32px;margin:0 0 6px;transform:rotate(-1deg);}
+  .hero p{margin:0;color:var(--ink-soft);font-size:14px;max-width:440px;}
+  .hero .badge{
+    background:var(--stamp);color:var(--white);font-weight:700;font-size:11px;
+    padding:6px 12px;border-radius:999px;letter-spacing:.04em;white-space:nowrap;
+  }
+ 
+  /* ---------- Category chips ---------- */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .chip{
+    border:2px solid var(--ink);background:var(--white);
+    padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;
+  }
+  .chip.active{background:var(--ink);color:var(--white);}
+ 
+  /* ---------- Menu grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+  .card{
+    background:var(--white);border:2px solid var(--ink);border-radius:12px;
+    padding:16px;position:relative;display:flex;flex-direction:column;gap:8px;
+    box-shadow:3px 3px 0 var(--line);
+  }
+  .card.unavailable{opacity:.55;}
+  .card .cat-eyebrow{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .card h3{margin:0;font-size:17px;font-weight:700;}
+  .card .price{font-family:'Space Mono',monospace;font-weight:700;font-size:15px;color:var(--green);}
+  .badge-new{
+    position:absolute;top:-9px;right:12px;
+    background:var(--turmeric);color:var(--white);
+    font-size:10px;font-weight:800;letter-spacing:.05em;
+    padding:4px 8px;border-radius:6px;transform:rotate(3deg);
+    box-shadow:2px 2px 0 var(--ink);
+  }
+  .stamp{
+    position:absolute;top:38%;left:50%;
+    transform:translate(-50%,-50%) rotate(-14deg);
+    border:3px double var(--stamp);color:var(--stamp);
+    font-weight:800;font-size:15px;letter-spacing:.08em;
+    padding:5px 12px;border-radius:6px;
+    text-transform:uppercase;background:var(--stamp-soft);
+    pointer-events:none;
+  }
+  .qty-row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:6px;}
+  .stepper{display:flex;align-items:center;gap:10px;border:2px solid var(--ink);border-radius:8px;padding:2px 4px;}
+  .stepper button{background:none;border:none;font-size:16px;font-weight:800;width:24px;height:24px;line-height:1;}
+  .stepper span{font-family:'Space Mono',monospace;min-width:16px;text-align:center;}
+  .add-btn{
+    background:var(--ink);color:var(--white);border:none;border-radius:8px;
+    padding:8px 14px;font-weight:700;font-size:13px;
+  }
+  .add-btn:disabled{background:var(--line);color:var(--ink-soft);cursor:not-allowed;}
+ 
+  /* ---------- Cart floating ---------- */
+  .cart-fab{
+    position:fixed;bottom:22px;right:22px;z-index:50;
+    background:var(--stamp);color:var(--white);border:none;border-radius:999px;
+    padding:14px 20px;font-weight:800;font-size:14px;
+    box-shadow:0 4px 0 #7f2c28;display:flex;align-items:center;gap:8px;
+  }
+  .cart-fab .count{background:var(--white);color:var(--stamp);border-radius:999px;padding:2px 8px;font-family:'Space Mono',monospace;}
+ 
+  .overlay{position:fixed;inset:0;background:rgba(43,38,32,.5);z-index:60;display:none;align-items:flex-end;justify-content:center;}
+  .overlay.show{display:flex;}
+  @media(min-width:720px){ .overlay{align-items:center;} }
+ 
+  .receipt{
+    background:var(--white);width:100%;max-width:420px;max-height:88vh;overflow-y:auto;
+    border-radius:16px 16px 0 0;padding:22px 22px 26px;position:relative;
+  }
+  @media(min-width:720px){ .receipt{border-radius:14px;} }
+  .receipt h2{font-family:'Permanent Marker',cursive;margin:0 0 4px;font-size:22px;}
+  .receipt .meta{font-size:11px;color:var(--ink-soft);margin-bottom:14px;}
+  .receipt .zigzag{height:12px;background-image:linear-gradient(135deg,var(--paper) 25%,transparent 25%),linear-gradient(-135deg,var(--paper) 25%,transparent 25%);background-size:14px 14px;background-position:bottom;margin:14px -22px;}
+  .line-item{display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:6px 0;border-bottom:1px dashed var(--line);gap:10px;}
+  .line-item .nm{flex:1;}
+  .line-item .px{font-family:'Space Mono',monospace;white-space:nowrap;}
+  .rm-btn{background:none;border:none;color:var(--stamp);font-size:16px;font-weight:800;padding:0 4px;}
+  .total-row{display:flex;justify-content:space-between;font-weight:800;font-size:16px;margin-top:10px;font-family:'Space Mono',monospace;}
+  .note-field{width:100%;border:2px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;margin-top:12px;resize:vertical;min-height:50px;}
+  .submit-btn{width:100%;background:var(--green);color:var(--white);border:none;border-radius:10px;padding:13px;font-weight:800;font-size:14px;margin-top:14px;}
+  .close-x{position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;color:var(--ink-soft);}
+  .empty-note{color:var(--ink-soft);font-size:13px;text-align:center;padding:20px 0;}
+ 
+  .confirm-ticket{text-align:center;}
+  .confirm-ticket .num{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;margin:10px 0;}
+  .confirm-ticket .stamp-ok{display:inline-block;border:3px double var(--green);color:var(--green);font-weight:800;padding:6px 16px;border-radius:6px;transform:rotate(-4deg);margin:10px 0;letter-spacing:.05em;}
+ 
+  /* ---------- Admin ---------- */
+  .admin-gate{max-width:340px;margin:60px auto;background:var(--white);border:2px solid var(--ink);border-radius:14px;padding:28px;text-align:center;}
+  .admin-gate h2{font-family:'Permanent Marker',cursive;margin-top:0;}
+  .admin-gate input{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:8px;font-size:14px;margin:12px 0;text-align:center;}
+  .admin-gate button{width:100%;background:var(--ink);color:var(--white);border:none;border-radius:8px;padding:10px;font-weight:700;}
+  .admin-gate .err{color:var(--stamp);font-size:12px;height:16px;}
+  .shake{animation:shake .3s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .hint{font-size:11px;color:var(--ink-soft);margin-top:10px;}
+ 
+  .admin-section{background:var(--white);border:2px solid var(--ink);border-radius:12px;padding:18px 20px;margin-bottom:20px;}
+  .admin-section h2{font-family:'Permanent Marker',cursive;font-size:20px;margin:0 0 4px;}
+  .admin-section .desc{font-size:12px;color:var(--ink-soft);margin-bottom:14px;}
+  .admin-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);}
+  .admin-row:last-child{border-bottom:none;}
+  .admin-row .nm{flex:1;min-width:0;}
+  .admin-row .nm b{display:block;font-size:14px;}
+  .admin-row .nm .cat{font-size:11px;color:var(--ink-soft);}
+  .price-edit{width:90px;border:2px solid var(--line);border-radius:6px;padding:5px 6px;font-family:'Space Mono',monospace;font-size:12px;}
+  .switch{position:relative;width:42px;height:24px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:var(--stamp);border-radius:999px;transition:.2s;}
+  .slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--white);border-radius:50%;transition:.2s;}
+  .switch input:checked + .slider{background:var(--green);}
+  .switch input:checked + .slider:before{transform:translateX(18px);}
+  .trash{background:none;border:none;color:var(--stamp-soft);color:var(--ink-soft);font-size:16px;}
+  .trash:hover{color:var(--stamp);}
+  .add-form{display:grid;grid-template-columns:1.4fr 0.8fr 1fr auto;gap:8px;margin-top:14px;align-items:center;}
+  @media(max-width:640px){ .add-form{grid-template-columns:1fr 1fr;} }
+  .add-form input,.add-form select{border:2px solid var(--line);border-radius:8px;padding:9px 10px;font-size:13px;}
+  .add-form button{background:var(--turmeric);color:var(--white);border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;white-space:nowrap;}
+  .new-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);grid-column:span 2;}
+  @media(max-width:640px){ .new-check{grid-column:span 2;} }
+ 
+  .order-ticket{background:var(--paper-alt);border:2px dashed var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+  .order-ticket .head{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+  .order-ticket .items{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.6;}
+  .order-ticket .foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+  .order-ticket .status-btn{border:2px solid var(--ink);background:var(--white);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:700;}
+  .order-ticket .status-btn.done{background:var(--green);color:var(--white);border-color:var(--green);}
+  .logout-btn{background:none;border:2px solid var(--ink);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;}
+ 
+  .top-bar-admin{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:80;opacity:0;transition:.25s;pointer-events:none;}
+  .toast.show{opacity:1;bottom:30px;}
+</style>
+</head>
+<body>
+ 
+<header class="top">
+  <div class="brand">
+    <span class="logo">Kantin Sekolah</span>
+    <span class="sub">preview</span>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tabCustomerBtn" onclick="switchTab('customer')">Menu &amp; Pesan</button>
+    <button class="tab-btn" id="tabAdminBtn" onclick="switchTab('admin')">Dashboard Admin</button>
+  </div>
+</header>
+ 
+<main>
+  <div id="customerView"></div>
+  <div id="adminView" style="display:none;"></div>
+</main>
+ 
+<button class="cart-fab" id="cartFab" onclick="openCart()" style="display:none;">
+  🧾 Keranjang <span class="count" id="cartCount">0</span>
+</button>
+ 
+<div class="overlay" id="cartOverlay" onclick="closeOnOverlay(event,'cartOverlay')">
+  <div class="receipt" id="cartReceipt"></div>
+</div>
+ 
+<div class="overlay" id="confirmOverlay">
+  <div class="receipt" id="confirmReceipt"></div>
+</div>
+ 
+<div class="toast" id="toast"></div>
+ 
+<script>
+/* ---------------- Storage helpers ---------------- */
+async function storageGet(key, shared){
+  try{
+    const r = await window.storage.get(key, shared);
+    return r ? JSON.parse(r.value) : null;
+  }catch(e){ return null; }
+}
+async function storageSet(key, value, shared){
+  try{ await window.storage.set(key, JSON.stringify(value), shared); }
+  catch(e){ console.error('storage set failed', key, e); }
+}
+ 
+const SEED_MENU = [
+  {id:'m1', name:'Nasi Goreng Spesial', price:12000, category:'Makanan Berat', available:true, isNew:false},
+  {id:'m2', name:'Mie Ayam Bakso', price:11000, category:'Makanan Berat', available:true, isNew:false},
+  {id:'m3', name:'Nasi Uduk + Ayam', price:13000, category:'Makanan Berat', available:true, isNew:true},
+  {id:'m4', name:'Bakso Kuah', price:10000, category:'Makanan Berat', available:false, isNew:false},
+  {id:'m5', name:'Gorengan (3pcs)', price:3000, category:'Snack', available:true, isNew:false},
+  {id:'m6', name:'Roti Bakar Coklat', price:8000, category:'Snack', available:true, isNew:false},
+  {id:'m7', name:'Es Teh Manis', price:4000, category:'Minuman', available:true, isNew:false},
+  {id:'m8', name:'Es Jeruk', price:5000, category:'Minuman', available:true, isNew:false},
+  {id:'m9', name:'Es Milo', price:7000, category:'Minuman', available:true, isNew:true},
+];
+const DEFAULT_PASSWORD = 'kantin123';
+ 
+let menu = [];
+let orders = [];
+let cart = {};
+let activeCategory = 'Semua';
+let adminLoggedIn = false;
+ 
+function rupiah(n){ return 'Rp' + n.toLocaleString('id-ID'); }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+ 
+/* ---------------- Init ---------------- */
+async function init(){
+  let m = await storageGet('menu', true);
+  if(!m){ m = SEED_MENU; await storageSet('menu', m, true); }
+  menu = m;
+ 
+  let o = await storageGet('orders', true);
+  orders = o || [];
+ 
+  let pw = await storageGet('admin-password', true);
+  if(!pw){ await storageSet('admin-password', DEFAULT_PASSWORD, true); }
+ 
+  renderCustomer();
+  renderAdminGate();
+}
+init();
+ 
+/* ---------------- Tabs ---------------- */
+function switchTab(tab){
+  document.getElementById('tabCustomerBtn').classList.toggle('active', tab==='customer');
+  document.getElementById('tabAdminBtn').classList.toggle('active', tab==='admin');
+  document.getElementById('customerView').style.display = tab==='customer' ? '' : 'none';
+  document.getElementById('adminView').style.display = tab==='admin' ? '' : 'none';
+  document.getElementById('cartFab').style.display = tab==='customer' ? 'flex' : 'none';
+  if(tab==='admin' && adminLoggedIn){ renderAdminDashboard(); }
+}
+ 
+/* ---------------- Customer view ---------------- */
+function renderCustomer(){
+  const cats = ['Semua', ...new Set(menu.map(i=>i.category))];
+  const items = activeCategory==='Semua' ? menu : menu.filter(i=>i.category===activeCategory);
+ 
+  const html = `
+    <div class="hero">
+      <div>
+        <h1>Lapar? Pesan aja 🍽️</h1>
+        <p>Lihat menu hari ini, tandai favoritmu, dan catat pesananmu — tinggal bayar cash pas ambil di kantin.</p>
+      </div>
+      <span class="badge">MODE PREVIEW</span>
+    </div>
+    <div class="chips">
+      ${cats.map(c=>`<button class="chip ${c===activeCategory?'active':''}" onclick="setCategory('${c}')">${c}</button>`).join('')}
+    </div>
+    <div class="grid">
+      ${items.map(cardHtml).join('') || '<p class="empty-note">Belum ada menu di kategori ini.</p>'}
+    </div>
+  `;
+  document.getElementById('customerView').innerHTML = html;
+  document.getElementById('cartFab').style.display = 'flex';
+  updateCartCount();
+}
+function cardHtml(item){
+  const qty = cart[item.id] || 0;
+  return `
+    <div class="card ${!item.available?'unavailable':''}">
+      ${item.isNew ? '<span class="badge-new">MENU BARU</span>' : ''}
+      ${!item.available ? '<span class="stamp">Habis</span>' : ''}
+      <span class="cat-eyebrow">${item.category}</span>
+      <h3>${item.name}</h3>
+      <span class="price">${rupiah(item.price)}</span>
+      <div class="qty-row">
+        <div class="stepper">
+          <button onclick="changeQty('${item.id}',-1)">−</button>
+          <span>${qty}</span>
+          <button onclick="changeQty('${item.id}',1)">+</button>
+        </div>
+        <button class="add-btn" ${!item.available?'disabled':''} onclick="addToCart('${item.id}')">+ Keranjang</button>
+      </div>
+    </div>
+  `;
+}
+function setCategory(c){ activeCategory = c; renderCustomer(); }
+function changeQty(id, delta){
+  const current = cart[id] || 0;
+  const next = Math.max(0, current + delta);
+  if(next===0){ delete cart[id]; } else { cart[id] = next; }
+  renderCustomer();
+}
+function addToCart(id){
+  if(!cart[id]) cart[id] = 1;
+  showToast('Ditambahkan ke keranjang');
+  renderCustomer();
+}
+function updateCartCount(){
+  const count = Object.values(cart).reduce((a,b)=>a+b,0);
+  document.getElementById('cartCount').textContent = count;
+}
+ 
+function openCart(){
+  const overlay = document.getElementById('cartOverlay');
+  const entries = Object.entries(cart).map(([id,qty])=>{
+    const item = menu.find(m=>m.id===id);
+    return item ? {...item, qty} : null;
+  }).filter(Boolean);
+  const total = entries.reduce((sum,e)=>sum + e.price*e.qty, 0);
+ 
+  document.getElementById('cartReceipt').innerHTML = `
+    <button class="close-x" onclick="closeOverlay('cartOverlay')">✕</button>
+    <h2>Keranjang</h2>
+    <div class="meta mono">${new Date().toLocaleString('id-ID')}</div>
+    ${entries.length ? entries.map(e=>`
+      <div class="line-item">
+        <span class="nm">${e.qty}× ${e.name}</span>
+        <span class="px">${rupiah(e.price*e.qty)}</span>
+        <button class="rm-btn" onclick="changeQty('${e.id}',-${e.qty});openCart();renderCustomer();">✕</button>
+      </div>
+    `).join('') : '<p class="empty-note">Keranjang masih kosong. Yuk pilih menu dulu!</p>'}
+    ${entries.length ? `
+      <div class="zigzag"></div>
+      <div class="total-row"><span>Total</span><span>${rupiah(total)}</span></div>
+      <textarea class="note-field" id="orderNote" placeholder="Catatan (opsional): kelas, level pedas, dll."></textarea>
+      <button class="submit-btn" onclick="submitOrder()">Catat Pesanan</button>
+      <p class="hint" style="text-align:center;">Ini masih preview — pembayaran tetap cash langsung di kantin ya.</p>
+    ` : ''}
+  `;
+  overlay.classList.add('show');
+}
+function closeOverlay(id){ document.getElementById(id).classList.remove('show'); }
+function closeOnOverlay(e,id){ if(e.target.id===id) closeOverlay(id); }
+ 
+async function submitOrder(){
+  const entries = Object.entries(cart).map(([id,qty])=>{
+    const item = menu.find(m=>m.id===id);
+    return item ? {id, name:item.name, qty, price:item.price} : null;
+  }).filter(Boolean);
+  if(!entries.length) return;
+  const total = entries.reduce((s,e)=>s+e.price*e.qty,0);
+  const note = document.getElementById('orderNote').value.trim();
+  const orderNum = 'K' + (1000 + orders.length + 1);
+  const order = { id: orderNum, items: entries, total, note, timestamp: new Date().toISOString(), status:'baru' };
+ 
+  orders = [order, ...orders];
+  await storageSet('orders', orders, true);
+ 
+  cart = {};
+  closeOverlay('cartOverlay');
+  renderCustomer();
+ 
+  document.getElementById('confirmReceipt').innerHTML = `
+    <button class="close-x" onclick="closeOverlay('confirmOverlay')">✕</button>
+    <div class="confirm-ticket">
+      <span class="cat-eyebrow">Nomor Pesanan</span>
+      <div class="num mono">${orderNum}</div>
+      <div class="stamp-ok">Tercatat</div>
+      <div class="zigzag"></div>
+      ${order.items.map(e=>`
+        <div class="line-item"><span class="nm">${e.qty}× ${e.name}</span><span class="px">${rupiah(e.price*e.qty)}</span></div>
+      `).join('')}
+      <div class="total-row"><span>Total</span><span>${rupiah(order.total)}</span></div>
+      <p class="hint">Tunjukkan nomor pesanan ini &amp; bayar cash saat ambil di kantin.</p>
+    </div>
+  `;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+ 
+/* ---------------- Admin view ---------------- */
+function renderAdminGate(){
+  document.getElementById('adminView').innerHTML = `
+    <div class="admin-gate" id="gateBox">
+      <h2>Masuk Admin</h2>
+      <p class="desc" style="color:var(--ink-soft);font-size:13px;">Khusus petugas kantin</p>
+      <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')tryLogin()">
+      <div class="err" id="pwErr"></div>
+      <button onclick="tryLogin()">Masuk</button>
+      <p class="hint">Demo — password default: <b class="mono">${DEFAULT_PASSWORD}</b></p>
+    </div>
+  `;
+}
+async function tryLogin(){
+  const input = document.getElementById('pwInput').value;
+  const stored = await storageGet('admin-password', true) || DEFAULT_PASSWORD;
+  if(input === stored){
+    adminLoggedIn = true;
+    renderAdminDashboard();
+  } else {
+    document.getElementById('pwErr').textContent = 'Password salah, coba lagi.';
+    const box = document.getElementById('gateBox');
+    box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+  }
+}
+function logoutAdmin(){ adminLoggedIn = false; renderAdminGate(); }
+ 
+function renderAdminDashboard(){
+  const sortedOrders = [...orders].sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
+  document.getElementById('adminView').innerHTML = `
+    <div class="top-bar-admin">
+      <h1 class="marker" style="font-size:24px;margin:0;">Dashboard Kantin</h1>
+      <button class="logout-btn" onclick="logoutAdmin()">Keluar</button>
+    </div>
+ 
+    <div class="admin-section">
+      <h2>Kelola Menu</h2>
+      <p class="desc">Nyalakan/matikan ketersediaan, ubah harga, atau hapus menu.</p>
+      ${menu.map(item=>`
+        <div class="admin-row">
+          <div class="nm">
+            <b>${item.name} ${item.isNew?'<span style=\"color:var(--turmeric);font-size:11px;\">● baru</span>':''}</b>
+            <span class="cat">${item.category}</span>
+          </div>
+          <input class="price-edit mono" type="number" value="${item.price}" onchange="updatePrice('${item.id}', this.value)">
+          <label class="switch">
+            <input type="checkbox" ${item.available?'checked':''} onchange="toggleAvailable('${item.id}')">
+            <span class="slider"></span>
+          </label>
+          <button class="trash" onclick="deleteItem('${item.id}')" title="Hapus">🗑</button>
+        </div>
+      `).join('')}
+      <div class="add-form">
+        <input id="newName" placeholder="Nama menu baru">
+        <input id="newPrice" type="number" placeholder="Harga">
+        <select id="newCat">
+          <option>Makanan Berat</option>
+          <option>Snack</option>
+          <option>Minuman</option>
+        </select>
+        <button onclick="addMenuItem()">+ Tambah</button>
+        <label class="new-check"><input type="checkbox" id="newIsNew"> Tandai sebagai "Menu Baru"</label>
+      </div>
+    </div>
+ 
+    <div class="admin-section">
+      <h2>Pesanan Masuk</h2>
+      <p class="desc">${sortedOrders.length} pesanan tercatat (mode preview, belum ada pembayaran online).</p>
+      ${sortedOrders.length ? sortedOrders.map(o=>`
+        <div class="order-ticket">
+          <div class="head">
+            <span class="mono">#${o.id}</span>
+            <span>${new Date(o.timestamp).toLocaleString('id-ID')}</span>
+          </div>
+          <div class="items">
+            ${o.items.map(it=>`${it.qty}× ${it.name} — ${rupiah(it.price*it.qty)}`).join('<br>')}
+          </div>
+          ${o.note ? `<div class="hint">Catatan: ${o.note}</div>` : ''}
+          <div class="foot">
+            <b class="mono">${rupiah(o.total)}</b>
+            <button class="status-btn ${o.status==='selesai'?'done':''}" onclick="toggleOrderStatus('${o.id}')">
+              ${o.status==='selesai' ? '✓ Selesai' : 'Tandai Selesai'}
+            </button>
+          </div>
+        </div>
+      `).join('') : '<p class="empty-note">Belum ada pesanan masuk.</p>'}
+    </div>
+  `;
+}
+ 
+async function updatePrice(id, value){
+  const price = parseInt(value,10) || 0;
+  menu = menu.map(m=> m.id===id ? {...m, price} : m);
+  await storageSet('menu', menu, true);
+  renderCustomer();
+  showToast('Harga diperbarui');
+}
+async function toggleAvailable(id){
+  menu = menu.map(m=> m.id===id ? {...m, available:!m.available} : m);
+  await storageSet('menu', menu, true);
+  renderCustomer();
+  renderAdminDashboard();
+  showToast('Status ketersediaan diperbarui');
+}
+async function deleteItem(id){
+  menu = menu.filter(m=>m.id!==id);
+  await storageSet('menu', menu, true);
+  renderCustomer();
+  renderAdminDashboard();
+  showToast('Menu dihapus');
+}
+async function addMenuItem(){
+  const name = document.getElementById('newName').value.trim();
+  const price = parseInt(document.getElementById('newPrice').value,10) || 0;
+  const category = document.getElementById('newCat').value;
+  const isNew = document.getElementById('newIsNew').checked;
+  if(!name || !price){ showToast('Isi nama & harga dulu'); return; }
+  const id = 'm' + Date.now();
+  menu = [...menu, {id, name, price, category, available:true, isNew}];
+  await storageSet('menu', menu, true);
+  renderCustomer();
+  renderAdminDashboard();
+  showToast('Menu baru ditambahkan');
+}
+async function toggleOrderStatus(id){
+  orders = orders.map(o=> o.id===id ? {...o, status: o.status==='selesai' ? 'baru' : 'selesai'} : o);
+  await storageSet('orders', orders, true);
+  renderAdminDashboard();
+}
+</script>
+</body>
+</html>
